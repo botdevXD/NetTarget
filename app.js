@@ -21,9 +21,9 @@ const ExpressWebSocket = ExpressWS(ExpressApp); // Our express websocket which c
 const WebSocketInstance = ExpressWebSocket.getWss("/server_socket"); // Get the cached data of our worker web socket!
 const Servers = {// We'll use the server IP to identify who it is, example: if the server is classed as operator it'll be the one to send out all the commands that the other servers will listen to!
     ["95.111.241.15"]: "operator",
+    ["34.245.169.74"]: "operator",
     ["172.18.0.1"]: "operator",
-    ["157.245.70.71"]: "slave",
-    ["72.14.177.32"]: "operator"
+    ["157.245.70.71"]: "slave"
 };
 const TaskList = { // We'll use this to over-ride tasks!
     "new_account": {Priority: 1, Task: "Account Creation"}
@@ -437,7 +437,7 @@ try{
                     //ConsoleLogger("[SERVER] -> [SOCKET] -> [ERROR] -> " + 'Failed to connect to master server / socket, retrying!');
 
                     if (!StopConnection){
-                        NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "ws://95.111.241.15:7453/server_socket");
+                        NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nodetestingservice.herokuapp.com:443/server_socket");
                     }
                 });
 
@@ -446,7 +446,7 @@ try{
                     
                     Client.on("close", () => {
                         if (!StopConnection){
-                            NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "ws://95.111.241.15:7453/server_socket");
+                            NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nodetestingservice.herokuapp.com:443/server_socket");
                         }
                     })
 
@@ -457,7 +457,7 @@ try{
                 }); // Listen for the messages from our master server
 
                 if (!StopConnection){
-                    NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "ws://95.111.241.15:7453/server_socket");
+                    NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nodetestingservice.herokuapp.com:443/server_socket");
                 }
                 
                 let AppVersionInter = null
@@ -502,7 +502,7 @@ try{
             }else if (PC_RANK == "operator"){
                 const NewWebClient = new ClientWebSocket(); // create the masters web client object
 
-                NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "ws://95.111.241.15:7453/server_socket"); // we want the master / operator to make itself a connection so we can send out our signals from it
+                NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nodetestingservice.herokuapp.com:443/server_socket"); // we want the master / operator to make itself a connection so we can send out our signals from it
             };
         }catch (listen_socket_error){
             ConsoleLogger("[SERVER] -> [ERROR] -> failed to connect to clients web socket, " + listen_socket_error);
