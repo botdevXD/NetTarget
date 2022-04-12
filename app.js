@@ -365,8 +365,6 @@ try{
                     return Client.close();
                 }; // Filter out mass connections from the same IP
                 
-                Servers[Request.clientIp] = (typeof Servers[Request.clientIp] != "undefined") ? Servers[Request.clientIp] : "slave"
-
                 if (typeof Servers[Request.clientIp.toString()] == "undefined" || Servers[Request.clientIp.toString()] == null){
                     Client.send("Bad connection 2");
                     return Client.close();
