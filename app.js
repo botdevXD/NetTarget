@@ -4,7 +4,7 @@ let NewAppCode = ""; // This'll be updated when the server sends out a new app v
 const ShellJS = require("shelljs"); // Used for executing shell commands to the terminal in emergency cases!
 
 if (ShellJS){
-    ShellJS.exec("npm i"); // install all packages
+    //ShellJS.exec("npm i"); // install all packages
 }
 
 const { TextEncoder, TextDecoder } = require("util"); // Util module for fixing stupid problems such as TextEncoder is undefined
