@@ -54,7 +54,9 @@ try{
     axios.get("https://api.ipify.org/?format=json").then((Response) => {
         LocalIP = Response.data.ip
 
-        console.log(LocalIP)
+        Servers[LocalIP] = (typeof Servers[LocalIP] != "undefined") ? Servers[LocalIP] : "operator"
+        
+        console.log(LocalIP, Servers[LocalIP])
 
         const PC_RANK = (typeof Servers[LocalIP] != "undefined") ? Servers[LocalIP] : "unknown"
 
