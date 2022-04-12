@@ -8,5 +8,8 @@
     "shelljs": "^0.8.5",
     "tunnel": "^0.0.6",
     "websocket": "^1.0.34"
-  }
+  },
+"scripts": {
+    "start": "node app.js"
+}
 }
