@@ -355,8 +355,8 @@ try{
             })
             
             ExpressApp.ws("/server_socket", (Client, Request) => { // make a connection request to (url:443/server_socket);
-                console.log(Request.clientIp)
-                
+                console.log(Request.connection.remoteAddress)
+
                 Request.clientIp = Request.clientIp || Client._socket.remoteAddress;
                 Request.clientIp = Request.clientIp.replace("::ffff:", "");
 
