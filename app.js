@@ -23,7 +23,8 @@ const Servers = {// We'll use the server IP to identify who it is, example: if t
     ["95.111.241.15"]: "operator",
     ["34.245.169.74"]: "operator",
     ["172.18.0.1"]: "operator",
-    ["157.245.70.71"]: "slave"
+    ["157.245.70.71"]: "slave",
+    ["31.49.168.36"]: "slave"
 };
 const TaskList = { // We'll use this to over-ride tasks!
     "new_account": {Priority: 1, Task: "Account Creation"}
