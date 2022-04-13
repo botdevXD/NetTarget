@@ -5,11 +5,12 @@
     "express-ws": "^5.0.2",
     "https-proxy-agent": "^5.0.0",
     "mongoose": "^6.2.10",
+    "node-fetch": "^3.2.3",
     "shelljs": "^0.8.5",
     "tunnel": "^0.0.6",
     "websocket": "^1.0.34"
   },
-"scripts": {
+  "scripts": {
     "start": "node app.js"
-}
+  }
 }

