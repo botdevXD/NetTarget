@@ -27,9 +27,15 @@
                 <div>
                     <input type="text" class="fadeIn first keyinputer" placeholder="Host">
                     <input type="password" class="fadeIn first keyinputer" placeholder="Port">
+                    <input type="text" class="fadeIn first keyinputer" placeholder="Time (seconds)">
+                    <select class="form-select" aria-label="Default select example">
+                        <option selected value="TCP">TCP</option>
+                        <option value="UDP">UDP</option>
+                        <option value="HTTP">HTTP</option>
+                      </select>
                 </div>
                 
-                <input type="submit" class="fadeIn fourth" value="Log In">
+                <input type="submit" class="fadeIn fourth" value="Launch Attack">
             </div>
         </div>
     </div>
@@ -118,25 +124,27 @@
 
         h2.active {
             color: #0d0d0d;
-            border-bottom: 2px solid rgb(221, 121, 20);
+            border-bottom: 2px solid rgb(113, 230, 46);
         }
 
         /* FORM TYPOGRAPHY*/
         input[type=button],
         input[type=submit],
         input[type=reset] {
-            background-color: rgb(221, 121, 20);
+            background-color: rgb(113, 230, 46);
             border: none;
             color: white;
             width: 85%;
             height: 50px;
             text-align: center;
             text-decoration: none;
+            outline: none;
+            font-weight: bold;
             display: inline-block;
             text-transform: uppercase;
             font-size: 16px;
-            -webkit-box-shadow: 0 10px 30px 0 rgba(255, 128, 0, 0.4);
-            box-shadow: 0 10px 30px 0 rgba(255, 128, 0, 0.4);
+            -webkit-box-shadow: 0 10px 30px 0 rgba(104, 201, 48, 0.4);
+            box-shadow: 0 10px 30px 0 rgba(104, 201, 48, 0.4);
             -webkit-border-radius: 5px 5px 5px 5px;
             border-radius: 5px 5px 5px 5px;
             margin: 5px 20px 40px 20px;
@@ -150,7 +158,7 @@
         input[type=button]:hover,
         input[type=submit]:hover,
         input[type=reset]:hover {
-            background-color: rgb(255, 128, 0);
+            background-color: rgb(104, 201, 48);
         }
 
         input[type=button]:active,
@@ -161,6 +169,28 @@
             -o-transform: scale(0.95);
             -ms-transform: scale(0.95);
             transform: scale(0.95);
+        }
+
+        select {
+            background-color: rgb(46, 50, 53);
+            border: none;
+            color: white;
+            padding: 15px 0px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 5px;
+            appearance: none;
+            width: 85%;
+            border: 2px solid rgb(50, 55, 59);
+            -webkit-transition: all 0.5s ease-in-out;
+            -moz-transition: all 0.5s ease-in-out;
+            -ms-transition: all 0.5s ease-in-out;
+            -o-transition: all 0.5s ease-in-out;
+            transition: all 0.5s ease-in-out;
+            -webkit-border-radius: 5px 5px 5px 5px;
+            border-radius: 5px 5px 5px 5px;
         }
 
         input[type=text] {
@@ -186,7 +216,7 @@
 
         input[type=text]:focus {
             background-color: rgb(46, 50, 53);
-            border-bottom: 2px solid rgb(221, 121, 20);
+            border-bottom: 2px solid rgb(113, 230, 46);
             color: white;
         }
 
@@ -217,7 +247,7 @@
 
         input[type=password]:focus {
             background-color: rgb(46, 50, 53);
-            border-bottom: 2px solid rgb(221, 121, 20);
+            border-bottom: 2px solid rgb(113, 230, 46);
             color: white;
         }
 

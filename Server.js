@@ -1,4 +1,5 @@
 const StartTime = new Date();
+
 const AppVersion = "1.0.0"; // this is the version which will identify each server and make sure they're up to date!
 let CurrentVersion = AppVersion; // Current version of the application, the master server sends this to all servers!
 let NewAppCode = ""; // This'll be updated when the server sends out a new app version request!
@@ -18,30 +19,34 @@ const ExpressApp = expressJS(); // Our express app
 const ExpressWebSocket = ExpressWS(ExpressApp); // Our express websocket which contains a set of functions for collecting all connected clients etc!
 const WebSocketInstance = ExpressWebSocket.getWss("/server_socket"); // Get the cached data of our worker web socket!
 const Functions = require("./Dependencies/Container/App/Functions");
-const AppPort = process.env.PORT || 8001; // Current web server port
-
-let Pages = {
-    ["/"]: "index.html"
-};
+const BootHandler = require("./Dependencies/Container/Boot/BootHandler");
+const PageData = require("./Dependencies/Container/App/PageData");
+const AppPort = process.env.PORT || 222; // Current web server port
+let Pages = PageData.Pages
 
 ExpressApp.use(requestIp.mw()); // Add request IPs into the server so we can do for example: request.clientIP
 ExpressApp.use(expressJS.json()); // Add auto convert for json structures
 ExpressApp.use(expressJS.static(__dirname + '/Dependencies/Web/WebPages'));
 
 ExpressApp.use((Request, Response) => {
-    let Page = (typeof Pages[Request.url]) ? `${__dirname}/Dependencies/Web/WebPages/${Pages[Request.url]}` : undefined; // Search for page, if found then return else return undefined
+    let PageData = (typeof Pages[Request.url] != "undefined") ? Pages[Request.url] : undefined; // Search for page, if found then return else return undefined
+    let Page = (typeof PageData != "undefined") ? `${__dirname}/Dependencies/Web/WebPages/${PageData.page_file}` : undefined; // Search for page, if found then return else return undefined
 
-    switch (Request.url){
-        default:
+    switch (Request.url.toString()){
+        default: // 404 page
             Page = `${__dirname}/Dependencies/Web/WebPages/404.html`
 
             Functions.RenderPage(Page, Response);
             break;
-        case "/":
-            Functions.RenderPage(Page, Response);
+        case (typeof PageData != "undefined") ? "/" : undefined: // Main Page
+            Functions.Execute(PageData.methods[Request.method] == true, [Functions.BadMethod, Response, Request.method], [Functions.RenderPage, Page, Response])
+            break;
+        case (typeof PageData != "undefined") ? "/api/attack" : undefined: // Main Page
+            Functions.Execute(PageData.methods[Request.method] == true, [Functions.BadMethod, Response, Request.method], [Functions.RenderPage, Page, Response])
             break;
     }
 })
+
 //localhost:8000
 
 ExpressApp.listen(AppPort, () => {
