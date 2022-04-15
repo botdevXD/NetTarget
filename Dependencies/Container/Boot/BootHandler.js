@@ -1,6 +1,6 @@
 class BootHandler{
-    HandleRequest = function(){
-        
+    HandleRequest = function(Request, Response){
+
     }
 }
 
