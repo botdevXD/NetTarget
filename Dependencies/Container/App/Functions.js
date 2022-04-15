@@ -16,13 +16,32 @@ class Functions{
         }
     }
 
-    BadMethod = function(){
+    BadMethod = function(Response, Method){
+        if (typeof Response == "object"){
+            Method = Response[1]
+            Response = Response[0]
+            
+            Response.status(405)
+            return Response.send(`${Method} requests are disabled for this endpoint!`)
+        }
 
+        if (typeof Response != "undefined"){
+            Response.status(405)
+            return Response.send(`${Method} requests are disabled for this endpoint!`)
+        }
     }
 
     Execute = function(Condition, FailCallbackData, SuccessCallbackData){
+        const SucessCallback = SuccessCallbackData[0]
+        const FailCallback = FailCallbackData[0]
+
+        SuccessCallbackData.splice(0, 1)
+        FailCallbackData.splice(0, 1)
+
         if (Condition == true){
-            //return Callback(Args)
+            return SucessCallback(SuccessCallbackData)
+        }else if (Condition == false){
+            return FailCallback(FailCallbackData)
         }
     }
 }
