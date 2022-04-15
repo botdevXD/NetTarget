@@ -50,6 +50,7 @@
                     TargetPort: 443,
                     TargetType: "TCP",
                     TargetTime: 60 * 2,
+                    TargetRequest: "START"
                 }).then((res) => {
                     console.log("success", res.data)
                 }).catch(() => {
