@@ -48,10 +48,10 @@
                 axios.post("/api/attack", {
                     TargetHost: "0.0.0.0",
                     TargetPort: 443,
-                    TargetType: "sTCP",
+                    TargetType: "TCP",
                     TargetTime: 60 * 2,
                 }).then((res) => {
-                    console.log("s", res.data)
+                    console.log("success", res.data)
                 }).catch(() => {
 
                 })

@@ -33,18 +33,18 @@ ExpressApp.use((Request, Response) => {
     let Page = (typeof PageData != "undefined") ? `${__dirname}/Dependencies/Web/WebPages/${PageData.page_file}` : undefined; // Search for page, if found then return else return undefined
 
     switch (Request.url.toString()){
+        case (typeof PageData != "undefined") ? "/" : undefined: // Main Page
+            Functions.Execute(PageData.methods[Request.method] == true, [Functions.BadMethod, Response, Request.method], [Functions.RenderPage, Page, Response])
+            break;
+        case (typeof PageData != "undefined") ? "/api/attack" : undefined: // Attack API
+            Functions.Execute(PageData.methods[Request.method] == true, [Functions.BadMethod, Response, Request.method], [function(){
+                return BootHandler.HandleRequest(Request, Response)
+            }])
+            break;
         default: // 404 page
             Page = `${__dirname}/Dependencies/Web/WebPages/404.html`
 
             Functions.RenderPage(Page, Response);
-            break;
-        case (typeof PageData != "undefined") ? "/" : undefined: // Main Page
-            Functions.Execute(PageData.methods[Request.method] == true, [Functions.BadMethod, Response, Request.method], [Functions.RenderPage, Page, Response])
-            break;
-        case (typeof PageData != "undefined") ? "/api/attack" : undefined: // Main Page
-            Functions.Execute(PageData.methods[Request.method] == true, [Functions.BadMethod, Response, Request.method], [function(){
-                return BootHandler.HandleRequest(Request, Response)
-            }])
             break;
     }
 })

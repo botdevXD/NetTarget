@@ -1,21 +1,30 @@
+const CurrentAttacks = [];
+
 class BootHandler{
     HandleRequest = function(Request, Response){
         const RequestBody = Request.body;
+        Response.status(200)
 
         switch (RequestBody.TargetType || ""){
             case "TCP":
-                console.log(1)
+                Response.json({
+                    success: true
+                })
                 break
             case "UDP":
-                console.log(2)
+                Response.json({
+                    success: true
+                })
                 break
             case "HTTP":
-                console.log(3)
+                Response.json({
+                    success: true
+                })
                 break
             default:
-                console.log(4)
                 Response.status(400)
                 Response.json({
+                    success: false,
                     error: "Attack method doesn't exist!"
                 })
                 break
