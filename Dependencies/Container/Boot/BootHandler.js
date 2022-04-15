@@ -14,6 +14,10 @@ class BootHandler{
                 break
             default:
                 console.log(4)
+                Response.status(400)
+                Response.json({
+                    error: "Attack method doesn't exist!"
+                })
                 break
         }
 
