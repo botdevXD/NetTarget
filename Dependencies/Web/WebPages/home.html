@@ -35,10 +35,24 @@
                       </select>
                 </div>
                 
-                <input type="submit" class="fadeIn fourth" value="Launch Attack">
+                <input id="submit_attack" type="submit" class="fadeIn fourth" value="Launch Attack">
             </div>
         </div>
     </div>
+
+    <script>
+        let Sumbit = window.document.getElementById("submit_attack");
+
+        if (Sumbit){
+            Sumbit.onclick = function(){
+                axios.post("/api/attack").then((res) => {
+                    console.log("s", res.data)
+                }).catch(() => {
+
+                })
+            }
+        }
+    </script>
 
     <style>
         /* BASIC */

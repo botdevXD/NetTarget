@@ -43,7 +43,7 @@ ExpressApp.use((Request, Response) => {
             break;
         case (typeof PageData != "undefined") ? "/api/attack" : undefined: // Main Page
             Functions.Execute(PageData.methods[Request.method] == true, [Functions.BadMethod, Response, Request.method], [function(){
-                return BootHandler(Request, Response)
+                return BootHandler.HandleRequest(Request, Response)
             }])
             break;
     }
