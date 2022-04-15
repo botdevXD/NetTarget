@@ -47,7 +47,6 @@ class BootHandler{
                     break
                 case "STOP":
                     if (typeof CurrentAttacks[Request.clientIP || "0.0.0.0.0"] != "undefined") {
-                        Response.status(200)
                         Response.json({
                             success: false,
                             error: "Attack stopped!"
