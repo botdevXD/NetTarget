@@ -10,8 +10,14 @@ class RateLimiter{
             endpoints: (typeof Options.endpoints == "object") ? Options.endpoints : {}
         };
 
-        setTimeout(() => {
-            
+        setInterval(() => {
+            for (const [URL_INDEX, END_POINT_DATA] of Object.entries(Options.url_data)) {
+                if (typeof END_POINT_DATA == "object"){
+                    for (const [CLIENT_IP, CLIENT_DATA] of Object.entries(END_POINT_DATA)) {
+                        Options.url_data[URL_INDEX][CLIENT_IP].requests = 0
+                    }
+                }
+            }
         }, Options.reset_time);
 
         return {
