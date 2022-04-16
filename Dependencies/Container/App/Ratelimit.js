@@ -29,17 +29,14 @@ class RateLimiter{
                     requests: 0
                 }
 
-                console.log(Options)
-
                 if (Options.url_data[Request.url][Request.clientIp].requests >= Options.max_requests){
                     Response.status(429);
                     Response.setHeader("RateLimit-Limit", Options.max_requests);
                     Response.setHeader("RateLimit-Remaining", Math.max(Options.max_requests - Options.TotalRequests, 0));
+                    return Response.send(Options.message.toString());
                 }else{
                     Options.url_data[Request.url][Request.clientIp].requests += 1
                 }
-                
-                return Response.send(Options.message.toString());
             };
         };
 
