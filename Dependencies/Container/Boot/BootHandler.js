@@ -1,8 +1,7 @@
-const CurrentAttacks = [];
-
 class BootHandler{
     constructor(){
-
+        this.GlobalAttacks = 0
+        this.CurrentAttacks = []
     }
 
     AttackTypeHandler = function(Request, Response){

@@ -8,6 +8,10 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link href="./css/bootstrap_css.css" rel="stylesheet">
     <script src="./js/bootstrap_js.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
+
     <title>Test page</title>
   </head>
   <body>
@@ -43,6 +47,8 @@
     <script>
         let Sumbit = window.document.getElementById("submit_attack");
 
+        toastr.options.timeOut = 1000; // 1s
+
         if (Sumbit){
             Sumbit.onclick = function(){
                 axios.post("/api/attack", {
@@ -51,10 +57,12 @@
                     TargetType: "TCP",
                     TargetTime: 60 * 2,
                     TargetRequest: "START"
-                }).then((res) => {
-                    console.log("success", res.data)
-                }).catch(() => {
+                }).then((Response) => {
+                    console.log("success", Response.data)
 
+                    toastr.success("Bro");
+                }).catch((Error) => {
+                    toastr.error(Error.response.data.error);
                 })
             }
         }

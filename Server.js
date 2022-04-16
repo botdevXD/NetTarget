@@ -16,10 +16,12 @@ const ClientWebSocket = require("websocket").client; // This is for connecting t
 const expressJS = require("express"); // For starting the server so we can connect web sockets etc
 const ExpressWS = require("express-ws"); // Express web sockets
 const ExpressApp = expressJS(); // Our express app
+const ExpressRatelimit = require("express-rate-limit"); // Used for rate limiting and slowing down requests on endpoints, this is to help with spam abuse etc
 const ExpressWebSocket = ExpressWS(ExpressApp); // Our express websocket which contains a set of functions for collecting all connected clients etc!
 const WebSocketInstance = ExpressWebSocket.getWss("/server_socket"); // Get the cached data of our worker web socket!
 const Functions = require("./Dependencies/Container/App/Functions");
 const BootHandler = require("./Dependencies/Container/Boot/BootHandler");
+const RateLimiterCustom = require("./Dependencies/Container/App/Ratelimit");
 const PageData = require("./Dependencies/Container/App/PageData");
 const AppPort = process.env.PORT || 222; // Current web server port
 let Pages = PageData.Pages
@@ -28,7 +30,26 @@ ExpressApp.use(requestIp.mw()); // Add request IPs into the server so we can do 
 ExpressApp.use(expressJS.json()); // Add auto convert for json structures
 ExpressApp.use(expressJS.static(__dirname + '/Dependencies/Web/WebPages'));
 
-ExpressApp.use((Request, Response) => {
+const RateTest = new RateLimiterCustom({
+    endpoints: Pages
+}).function
+
+/*const API_RATE_LIMIT = ExpressRatelimit({
+	windowMs: 1000 * 10, // 10 seconds
+	max: 10,
+    handler: async (Request, Response) => {
+        Response.status(429);
+
+        return Response.json({
+            success: false,
+            error: "You're currently being rate-limited!"
+        })
+    },
+	standardHeaders: true,
+    endpoint_data: Pages
+})*/
+
+ExpressApp.use(RateTest, (Request, Response) => {
     let PageData = (typeof Pages[Request.url] != "undefined") ? Pages[Request.url] : undefined; // Search for page, if found then return else return undefined
     let Page = (typeof PageData != "undefined") ? `${__dirname}/Dependencies/Web/WebPages/${PageData.page_file}` : undefined; // Search for page, if found then return else return undefined
 
