@@ -32,6 +32,8 @@ ExpressApp.use(expressJS.static(__dirname + '/Dependencies/Web/WebPages'));
 
 const RateTest = new RateLimiterCustom({
     message: undefined,
+    max_requests: 5,
+    reset_time: 10000,
     endpoints: Pages
 }).function
 

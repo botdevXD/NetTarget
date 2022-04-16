@@ -5,6 +5,7 @@ class RateLimiter{
         Options = {
             TotalRequests: 0,
             max_requests: (typeof Options.max_requests == "number") ? Options.max_requests : 100,
+            reset_time: (typeof Options.reset_time == "number") ? Options.reset_time : 60000,
             message: (typeof Options.message != "undefined" & Options.message != null) ? Options.message : "You've been rate limited!",
             endpoints: (typeof Options.endpoints == "object") ? Options.endpoints : {}
         }
