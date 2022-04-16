@@ -31,6 +31,7 @@ ExpressApp.use(expressJS.json()); // Add auto convert for json structures
 ExpressApp.use(expressJS.static(__dirname + '/Dependencies/Web/WebPages'));
 
 const RateTest = new RateLimiterCustom({
+    message: undefined,
     endpoints: Pages
 }).function
 
