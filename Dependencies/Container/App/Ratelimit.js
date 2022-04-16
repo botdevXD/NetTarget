@@ -15,7 +15,9 @@ class RateLimiter{
 
     RequestHandler = function(Options, Request, Response, Next){
         if (Options){
-            console.log('wow')
+            if (((typeof Options.endpoints[Request.url] != "undefined") ?  (typeof Options.endpoints[Request.url].rate_limit != "undefined" ? Options.endpoints[Request.url].rate_limit : false) : false) == true){
+                console.log('wow')
+            }
         }
 
         return Next()
