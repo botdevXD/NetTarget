@@ -2,6 +2,10 @@ class RateLimiter{
     constructor(Options){
         const RequestHandler = this.RequestHandler
 
+        Options = {
+            endpoints: (typeof Options.endpoints == "object") ? Options.endpoints : {}
+        }
+
         return {
             function: function(Request, Response, Next){
                 return RequestHandler(Options, Request, Response, Next)
@@ -10,8 +14,11 @@ class RateLimiter{
     }
 
     RequestHandler = function(Options, Request, Response, Next){
-        console.log(Request.url, Options)
-        Next()
+        if (Options){
+            console.log('wow')
+        }
+
+        return Next()
     }
 }
 
