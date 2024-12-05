@@ -1,11 +1,11 @@
 {
   "dependencies": {
-    "axios": "^0.26.1",
+    "axios": "^1.7.8",
     "express": "^4.17.3",
     "express-rate-limit": "^6.3.0",
     "express-ws": "^5.0.2",
     "https-proxy-agent": "^5.0.0",
-    "mongoose": "^6.2.10",
+    "mongoose": "^8.8.3",
     "net": "^1.0.2",
     "node-fetch": "^3.2.3",
     "request-ip": "^2.1.3",
